@@ -1,5 +1,6 @@
 package ua.kpi.sc;
 
+import android.app.AlertDialog;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteException;
 import android.provider.ContactsContract;
@@ -21,16 +22,20 @@ public class BackupGroups {
         dao = new BackupDAO(activity.getApplicationContext());
     }
 
-    public void makeBackup() {
+    public int makeBackup() {
+        int addedPairs = 0;
         try {
             dao.open();
-            dao.addPairs(getGroups());
+            List<ContactGroupPair> pairs = getGroups();
+            dao.addPairs(pairs);
             dao.close();
+            addedPairs = pairs.size();
         } catch (SQLiteException e) {
             e.printStackTrace();
         } finally {
             dao.close();
         }
+        return addedPairs;
     }
 
     public List<ContactGroupPair> getGroups() {
