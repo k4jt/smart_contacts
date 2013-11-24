@@ -56,5 +56,8 @@ public class BackupDAO {
         database.delete(BackupSQLiteHelper.TABLE_BACKUP, BackupSQLiteHelper.COLUMN_ID + " = " + pair.id, null);
     }
 
+    public void dropTable() {
+        backupHelper.dropTable(database);
+    }
 
 }

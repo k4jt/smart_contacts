@@ -18,7 +18,7 @@ public class BackupSQLiteHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = DB.NAME;
     private static final int DATABASE_VERSION = DB.VERSION;
 
-    private static final String DATABASE_CREATE = "if not exists create table "
+    private static final String DATABASE_CREATE = "CREATE TABLE IF NOT EXISTS "
             + TABLE_BACKUP + " (" + COLUMN_ID
             + " integer primary key autoincrement, " + COLUMN_CONTACT_ID
             + " integer not null, " + COLUMN_GROUP_ID + " integer not null);";
@@ -38,7 +38,11 @@ public class BackupSQLiteHelper extends SQLiteOpenHelper {
         Log.w(BackupSQLiteHelper.class.getName(),
                 "Upgrading database from version " + oldVersion + " to "
                         + newVersion + ", which will destroy all old data");
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_BACKUP);
+        dropTable(db);
         onCreate(db);
+    }
+
+    public void dropTable(SQLiteDatabase db) {
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_BACKUP);
     }
 }

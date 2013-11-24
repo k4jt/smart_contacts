@@ -14,7 +14,7 @@ import ua.kpi.sc.model.User;
 
 public class RegistrationActivity extends Activity {
 
-    private static final int MIN_PASSWORD_LENGTH = 4;
+    public static final int MIN_PASSWORD_LENGTH = 4;
     private EditText firstName;
     private EditText lastName;
     private EditText email;
@@ -22,6 +22,7 @@ public class RegistrationActivity extends Activity {
     private EditText password;
     private EditText repPassword;
     private Button submit;
+    private  UserControl userControl;
 
 
     @Override
@@ -39,6 +40,7 @@ public class RegistrationActivity extends Activity {
         submit = (Button)findViewById(R.id.reg_submit_button);
 
         final Activity activity = this;
+        userControl = new UserControl(this);
 
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -77,6 +79,19 @@ public class RegistrationActivity extends Activity {
         return null;
     }
 
+    private View validateLogin(EditText view) {
+        View result = validateTextField(view);
+        if (result == null) {
+            if (userControl.isLoginExist(view.getText().toString())) {
+                view.setError(getString(R.string.error_such_login_exist));
+                return view;
+            }
+            return null;
+        } else {
+            return result;
+        }
+    }
+
     private View validateEmailField(EditText view) {
         String value = view.getText().toString().trim();
         if (TextUtils.isEmpty(value)) {
@@ -84,6 +99,10 @@ public class RegistrationActivity extends Activity {
             return view;
         } else if (!value.contains("@")) {
             view.setError(getString(R.string.error_invalid_email));
+            return view;
+        }
+        if (userControl.isEmailExist(view.getText().toString())) {
+            view.setError(getString(R.string.error_such_email_exist));
             return view;
         }
         return null;
@@ -124,15 +143,35 @@ public class RegistrationActivity extends Activity {
         return null;
     }
 
+
     private boolean validateInputFields() {
         View focusView = null;
 
         focusView = validatePasswordField(password, repPassword);
-        focusView = validateEmailField(email);
-        focusView = validateTextField(login);
-        focusView = validateTextField(lastName);
-        focusView = validateTextField(firstName);
+        if (focusView != null) {
+            focusView.requestFocus();
+            return false;
+        }
 
+        focusView = validateEmailField(email);
+        if (focusView != null) {
+            focusView.requestFocus();
+            return false;
+        }
+
+        focusView = validateLogin(login);
+        if (focusView != null) {
+            focusView.requestFocus();
+            return false;
+        }
+
+        focusView = validateTextField(lastName);
+        if (focusView != null) {
+            focusView.requestFocus();
+            return false;
+        }
+
+        focusView = validateTextField(firstName);
         if (focusView != null) {
             focusView.requestFocus();
             return false;

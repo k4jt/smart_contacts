@@ -53,7 +53,7 @@ public class UserDAO {
         Cursor cursor = database.query(
                 UserSQLiteHelper.TABLE_USER,
                 new String[]{UserSQLiteHelper.COLUMN_PASSWORD},
-                UserSQLiteHelper.COLUMN_LOGIN + " = " + user.getLogin(),
+                UserSQLiteHelper.COLUMN_LOGIN + " = '" + user.getLogin() + "'",
                 null, null, null, null);
 
         if(cursor.moveToFirst())
@@ -77,6 +77,48 @@ public class UserDAO {
         return user;
     }
 
+    public User getUserByLogin(String login) {
+        Cursor cursor = database.query(
+                UserSQLiteHelper.TABLE_USER,
+                UserSQLiteHelper.ALL_COLUMNS,
+                UserSQLiteHelper.COLUMN_LOGIN + " = '" + login + "'",
+                null, null, null, null);
+
+        if (cursor.moveToFirst()) {
+            return getUserFromCursor(cursor);
+        }
+
+        return null;
+    }
+
+    public boolean isLoginExist(String login) {
+        Cursor cursor = database.query(
+                UserSQLiteHelper.TABLE_USER,
+                UserSQLiteHelper.ALL_COLUMNS,
+                UserSQLiteHelper.COLUMN_LOGIN + " = '" + login + "'",
+                null, null, null, null);
+
+        if (cursor.moveToFirst()) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean isEmailExist(String email) {
+        Cursor cursor = database.query(
+                UserSQLiteHelper.TABLE_USER,
+                UserSQLiteHelper.ALL_COLUMNS,
+                UserSQLiteHelper.COLUMN_EMAIL + " = '" + email + "'",
+                null, null, null, null);
+
+        if (cursor.moveToFirst()) {
+            return true;
+        }
+
+        return false;
+    }
+
     public User getUserById(long id) {
         Cursor cursor = database.query(
                 UserSQLiteHelper.TABLE_USER,
@@ -91,5 +133,8 @@ public class UserDAO {
         return null;
     }
 
+    public void dropTable() {
+        userHelper.dropTable(database);
+    }
 
 }

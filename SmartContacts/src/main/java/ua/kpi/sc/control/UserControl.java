@@ -21,7 +21,6 @@ public class UserControl {
         try {
             dao.open();
             dao.addUser(user);
-            dao.close();
         } catch (SQLiteException e) {
             e.printStackTrace();
         } finally {
@@ -29,6 +28,56 @@ public class UserControl {
         }
     }
 
+    public boolean checkUser(User user) {
+        boolean result = false;
+        try {
+            dao.open();
+            result = dao.checkUser(user);
+        } catch (SQLiteException e) {
+            e.printStackTrace();
+        } finally {
+            dao.close();
+        }
+        return result;
+    }
 
+    public User getUserByLogin(String login) {
+        User user = null;
+        try {
+            dao.open();
+            user = dao.getUserByLogin(login);
+        } catch (SQLiteException e) {
+            e.printStackTrace();
+        } finally {
+            dao.close();
+        }
+        return user;
+    }
+
+    public boolean isLoginExist(String login) {
+        boolean result = false;
+        try {
+            dao.open();
+            result = dao.isLoginExist(login);
+        } catch (SQLiteException e) {
+            e.printStackTrace();
+        } finally {
+            dao.close();
+        }
+        return result;
+    }
+
+    public boolean isEmailExist(String email) {
+        boolean result = false;
+        try {
+            dao.open();
+            result = dao.isEmailExist(email);
+        } catch (SQLiteException e) {
+            e.printStackTrace();
+        } finally {
+            dao.close();
+        }
+        return result;
+    }
 
 }

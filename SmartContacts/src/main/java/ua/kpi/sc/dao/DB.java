@@ -17,4 +17,13 @@ public class DB {
         backupDAO.createTable();
     }
 
+    public static void dropTables(Context context) {
+        UserDAO userDAO = new UserDAO(context);
+        BackupDAO backupDAO = new BackupDAO(context);
+
+        userDAO.dropTable();
+        backupDAO.dropTable();
+    }
+
+
 }

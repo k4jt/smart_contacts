@@ -42,13 +42,13 @@
                 android:layout_gravity="center_horizontal" />
 
             <EditText
-                android:id="@+id/email"
+                android:id="@+id/login"
                 android:singleLine="true"
                 android:maxLines="1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textEmailAddress"
-                android:hint="@string/prompt_email" />
+                android:hint="@string/prompt_login" />
 
             <EditText
                 android:id="@+id/password"

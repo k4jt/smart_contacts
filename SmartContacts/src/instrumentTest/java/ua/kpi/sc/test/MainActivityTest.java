@@ -9,6 +9,8 @@ public class MainActivityTest extends ActivityTestCase{
 
     public void testFunction(){
         assertEquals(2, 1 + 1);
+
+
     }
 
 

@@ -18,7 +18,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import ua.kpi.sc.R;
+import ua.kpi.sc.control.UserControl;
 import ua.kpi.sc.dao.DB;
+import ua.kpi.sc.model.User;
 
 /**
  * Activity which displays a login screen to the user, offering registration as
@@ -45,15 +47,17 @@ public class LoginActivity extends Activity {
     private UserLoginTask mAuthTask = null;
 
     // Values for email and password at the time of the login attempt.
-    private String mEmail;
+    private String mLogin;
     private String mPassword;
 
     // UI references.
-    private EditText mEmailView;
+    private EditText mLoginView;
     private EditText mPasswordView;
     private View mLoginFormView;
     private View mLoginStatusView;
     private TextView mLoginStatusMessageView;
+    private UserControl mUserControl;
+    private final Activity mActivity = this;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,10 +67,12 @@ public class LoginActivity extends Activity {
 
         DB.createTables(getApplicationContext());
 
+        mUserControl = new UserControl(this);
+
         // Set up the login form.
-        mEmail = getIntent().getStringExtra(EXTRA_EMAIL);
-        mEmailView = (EditText) findViewById(R.id.email);
-        mEmailView.setText(mEmail);
+        mLogin = getIntent().getStringExtra(EXTRA_EMAIL);
+        mLoginView = (EditText) findViewById(R.id.login);
+        mLoginView.setText(mLogin);
 
         mPasswordView = (EditText) findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -121,11 +127,11 @@ public class LoginActivity extends Activity {
         }
 
         // Reset errors.
-        mEmailView.setError(null);
+        mLoginView.setError(null);
         mPasswordView.setError(null);
 
         // Store values at the time of the login attempt.
-        mEmail = mEmailView.getText().toString();
+        mLogin = mLoginView.getText().toString();
         mPassword = mPasswordView.getText().toString();
 
         boolean cancel = false;
@@ -136,20 +142,16 @@ public class LoginActivity extends Activity {
             mPasswordView.setError(getString(R.string.error_field_required));
             focusView = mPasswordView;
             cancel = true;
-        } else if (mPassword.length() < 4) {
+        } else if (mPassword.length() < RegistrationActivity.MIN_PASSWORD_LENGTH) {
             mPasswordView.setError(getString(R.string.error_invalid_password));
             focusView = mPasswordView;
             cancel = true;
         }
 
         // Check for a valid email address.
-        if (TextUtils.isEmpty(mEmail)) {
-            mEmailView.setError(getString(R.string.error_field_required));
-            focusView = mEmailView;
-            cancel = true;
-        } else if (!mEmail.contains("@")) {
-            mEmailView.setError(getString(R.string.error_invalid_email));
-            focusView = mEmailView;
+        if (TextUtils.isEmpty(mLogin)) {
+            mLoginView.setError(getString(R.string.error_field_required));
+            focusView = mLoginView;
             cancel = true;
         }
 
@@ -164,8 +166,7 @@ public class LoginActivity extends Activity {
             showProgress(true);
             mAuthTask = new UserLoginTask();
             mAuthTask.execute((Void) null);
-            Intent intent = new Intent(this.getApplicationContext(), MainActivity.class);
-            startActivity(intent);
+
         }
     }
 
@@ -225,16 +226,11 @@ public class LoginActivity extends Activity {
                 return false;
             }
 
-            for (String credential : DUMMY_CREDENTIALS) {
-                String[] pieces = credential.split(":");
-                if (pieces[0].equals(mEmail)) {
-                    // Account exists, return true if the password matches.
-                    return pieces[1].equals(mPassword);
-                }
-            }
+            User user = new User();
+            user.setLogin(mLogin);
+            user.setPassword(mPassword);
 
-            // TODO: register the new account here.
-            return true;
+            return mUserControl.checkUser(user);
         }
 
         @Override
@@ -244,6 +240,10 @@ public class LoginActivity extends Activity {
 
             if (success) {
                 finish();
+                Intent intent = new Intent(mActivity.getApplicationContext(), MainActivity.class);
+                User user = mUserControl.getUserByLogin(mLogin);
+                intent.putExtra("user_name", user.getFirstName() + " " + user.getLastName());
+                startActivity(intent);
             } else {
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
                 mPasswordView.requestFocus();
