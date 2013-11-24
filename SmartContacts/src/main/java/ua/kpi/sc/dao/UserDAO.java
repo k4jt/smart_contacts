@@ -39,7 +39,7 @@ public class UserDAO {
         userHelper.close();
     }
 
-    public void addUser(User user) {
+    public long addUser(User user) {
         ContentValues values = new ContentValues();
         values.put(UserSQLiteHelper.COLUMN_FIRST_NAME, user.getFirstName());
         values.put(UserSQLiteHelper.COLUMN_LAST_NAME, user.getLastName());
@@ -47,6 +47,9 @@ public class UserDAO {
         values.put(UserSQLiteHelper.COLUMN_LOGIN, user.getLogin());
         values.put(UserSQLiteHelper.COLUMN_PASSWORD, user.getPassword());
         database.insert(UserSQLiteHelper.TABLE_USER, null, values);
+
+        User registeredUser = getUserByLogin(user.getLogin());
+        return registeredUser.getId();
     }
 
     public boolean checkUser(User user) {

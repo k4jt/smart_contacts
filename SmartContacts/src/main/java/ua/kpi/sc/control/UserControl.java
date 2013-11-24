@@ -17,15 +17,17 @@ public class UserControl {
         dao = new UserDAO(activity.getApplicationContext());
     }
 
-    public void addUser(User user) {
+    public long addUser(User user) {
+        long userId = 0;
         try {
             dao.open();
-            dao.addUser(user);
+            userId = dao.addUser(user);
         } catch (SQLiteException e) {
             e.printStackTrace();
         } finally {
             dao.close();
         }
+        return userId;
     }
 
     public boolean checkUser(User user) {

@@ -23,17 +23,22 @@ public class MainActivity extends Activity {
         final MainActivity activity = this;
 
         String userName = getIntent().getStringExtra("user_name");
+        final int userId = getIntent().getIntExtra("user_id", 0);
         TextView welcome = (TextView)findViewById(R.id.main_welcome);
         welcome.setText("Welcome, " + userName + "!");
 
         backup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int pairs = backupGroups.makeBackup();
 
                 AlertDialog dlgAlert  = new AlertDialog.Builder(activity).create();
-                dlgAlert.setMessage("Saved " + pairs + " contacts");
                 dlgAlert.setTitle("Backup");
+                if (backupGroups.isUserDidBackup(userId)) {
+                    dlgAlert.setMessage("You had already saved your contacts");
+                } else {
+                    int pairs = backupGroups.makeBackup(userId);
+                    dlgAlert.setMessage("Saved " + pairs + " contacts");
+                }
                 dlgAlert.setButton("Ok", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -41,10 +46,6 @@ public class MainActivity extends Activity {
                     }
                 });
                 dlgAlert.show();
-
-
-
-
             }
         });
 

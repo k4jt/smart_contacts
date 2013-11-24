@@ -46,9 +46,10 @@ public class RegistrationActivity extends Activity {
             @Override
             public void onClick(View v) {
                 if (validateInputFields()) {
-                    new UserControl(activity).addUser(getUserFromFields());
+                    long userId = userControl.addUser(getUserFromFields());
                     Intent intent = new Intent(activity.getApplicationContext(), MainActivity.class);
                     intent.putExtra("user_name", firstName.getText().toString() + " " + lastName.getText().toString());
+                    intent.putExtra("user_id", userId);
                     startActivity(intent);
                 }
             }

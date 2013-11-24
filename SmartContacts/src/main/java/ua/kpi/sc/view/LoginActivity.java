@@ -243,6 +243,7 @@ public class LoginActivity extends Activity {
                 Intent intent = new Intent(mActivity.getApplicationContext(), MainActivity.class);
                 User user = mUserControl.getUserByLogin(mLogin);
                 intent.putExtra("user_name", user.getFirstName() + " " + user.getLastName());
+                intent.putExtra("user_id", user.getId());
                 startActivity(intent);
             } else {
                 mPasswordView.setError(getString(R.string.error_incorrect_password));

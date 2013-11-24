@@ -2,6 +2,7 @@ package ua.kpi.sc.dao;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 
@@ -39,17 +40,32 @@ public class BackupDAO {
         }
     }
 
-    public void addPairs(List<ContactGroupPair> pairs) {
+    public void addPairs(List<ContactGroupPair> pairs, int userId) {
         for (ContactGroupPair pair : pairs) {
-            addPair(pair);
+            addPair(pair, userId);
         }
     }
 
-    public void addPair(ContactGroupPair pair) {
+    public void addPair(ContactGroupPair pair, int userId) {
         ContentValues values = new ContentValues();
+        values.put(BackupSQLiteHelper.COLUMN_USER_ID, userId);
         values.put(BackupSQLiteHelper.COLUMN_CONTACT_ID, pair.contactId);
         values.put(BackupSQLiteHelper.COLUMN_GROUP_ID, pair.groupId);
         database.insert(BackupSQLiteHelper.TABLE_BACKUP, null, values);
+    }
+
+    public boolean isUserDidBackup(int userId) {
+        Cursor cursor = database.query(
+                BackupSQLiteHelper.TABLE_BACKUP,
+                BackupSQLiteHelper.ALL_COLUMNS,
+                BackupSQLiteHelper.COLUMN_USER_ID + " = " + userId + "",
+                null, null, null, null);
+
+        if (cursor.moveToFirst()) {
+            return true;
+        }
+
+        return false;
     }
 
     public void deletePair(ContactGroupPair pair) {

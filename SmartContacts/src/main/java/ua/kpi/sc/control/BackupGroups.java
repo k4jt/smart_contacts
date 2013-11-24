@@ -26,13 +26,25 @@ public class BackupGroups {
         dao = new BackupDAO(activity.getApplicationContext());
     }
 
-    public int makeBackup() {
+    public boolean isUserDidBackup(int userId) {
+        boolean result = false;
+        try {
+            dao.open();
+            result =  dao.isUserDidBackup(userId);
+        } catch (SQLiteException e) {
+            e.printStackTrace();
+        } finally {
+            dao.close();
+        }
+        return result;
+    }
+
+    public int makeBackup(int userId) {
         int addedPairs = 0;
         try {
             dao.open();
             List<ContactGroupPair> pairs = getGroups();
-            dao.addPairs(pairs);
-            dao.close();
+            dao.addPairs(pairs, userId);
             addedPairs = pairs.size();
         } catch (SQLiteException e) {
             e.printStackTrace();
