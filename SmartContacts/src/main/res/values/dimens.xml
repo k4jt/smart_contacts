@@ -2,5 +2,8 @@
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
+    <integer name="max_name_length">50</integer>
+    <integer name="max_email_length">70</integer>
+    <integer name="max_password_length">20</integer>
 
     </resources>
