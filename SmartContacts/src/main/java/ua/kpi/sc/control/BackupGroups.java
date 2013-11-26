@@ -56,7 +56,11 @@ public class BackupGroups {
 
     public List<ContactGroupPair> getGroups() {
 
-        Cursor dataCursor = activity.getContentResolver().query(
+        Cursor dataCursor = null;
+        List<ContactGroupPair> contactGroups = null;
+
+        try {
+            dataCursor = activity.getContentResolver().query(
                 ContactsContract.Data.CONTENT_URI,
                 new String[]{
                         ContactsContract.Data.CONTACT_ID,
@@ -64,16 +68,21 @@ public class BackupGroups {
                 },
                 ContactsContract.Data.MIMETYPE + "=?",
                 new String[]{ContactsContract.CommonDataKinds.GroupMembership.CONTENT_ITEM_TYPE}, null
-        );
+                );
 
-        List<ContactGroupPair> contactGroups = new ArrayList<ContactGroupPair>();
+            if (dataCursor != null && dataCursor.getCount() > 0 && dataCursor.moveToFirst())
+            {
+                contactGroups = new ArrayList<ContactGroupPair>();
 
-        dataCursor.moveToFirst();
-        while(!dataCursor.isAfterLast()) {
-            contactGroups.add(getContactFromCursor(dataCursor));
-            dataCursor.moveToNext();
+                while(!dataCursor.isAfterLast()) {
+                    contactGroups.add(getContactFromCursor(dataCursor));
+                    dataCursor.moveToNext();
+                }
+            }
+        } finally {
+            dataCursor.close();
         }
-        dataCursor.close();
+
         return contactGroups;
     }
 

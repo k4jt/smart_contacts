@@ -148,33 +148,50 @@ public class RegistrationActivity extends Activity {
     private boolean validateInputFields() {
         View focusView = null;
 
-        focusView = validatePasswordField(password, repPassword);
-        if (focusView != null) {
-            focusView.requestFocus();
-            return false;
-        }
-
-        focusView = validateEmailField(email);
-        if (focusView != null) {
-            focusView.requestFocus();
-            return false;
-        }
-
-        focusView = validateLogin(login);
-        if (focusView != null) {
-            focusView.requestFocus();
-            return false;
-        }
-
-        focusView = validateTextField(lastName);
-        if (focusView != null) {
-            focusView.requestFocus();
-            return false;
-        }
-
         focusView = validateTextField(firstName);
         if (focusView != null) {
             focusView.requestFocus();
+            //return false;
+        }
+
+        if (focusView != null) {
+            validateTextField(lastName);
+        } else {
+            focusView = validateTextField(lastName);
+            if (focusView != null) {
+                focusView.requestFocus();
+            }
+        }
+
+        if (focusView != null) {
+            validateLogin(login);
+        } else {
+            focusView = validateLogin(login);
+            if (focusView != null) {
+                focusView.requestFocus();
+            }
+        }
+
+        if (focusView != null) {
+            validateEmailField(email);
+        } else {
+            focusView = validateEmailField(email);
+            if (focusView != null) {
+                focusView.requestFocus();
+            }
+        }
+
+        if (focusView != null) {
+            validatePasswordField(password, repPassword);
+        } else {
+            focusView = validatePasswordField(password, repPassword);
+            if (focusView != null) {
+                focusView.requestFocus();
+            }
+        }
+
+
+        if (focusView != null) {
             return false;
         }
 

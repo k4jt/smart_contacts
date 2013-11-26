@@ -55,21 +55,27 @@ public class BackupDAO {
     }
 
     public boolean isUserDidBackup(int userId) {
-        Cursor cursor = database.query(
-                BackupSQLiteHelper.TABLE_BACKUP,
-                BackupSQLiteHelper.ALL_COLUMNS,
-                BackupSQLiteHelper.COLUMN_USER_ID + " = " + userId + "",
-                null, null, null, null);
+        Cursor cursor = null;
+        try {
+            cursor = database.query(
+                    BackupSQLiteHelper.TABLE_BACKUP,
+                    BackupSQLiteHelper.ALL_COLUMNS,
+                    BackupSQLiteHelper.COLUMN_USER_ID + " =?",
+                    new String[]{String.valueOf(userId)}, null, null, null);
 
-        if (cursor.moveToFirst()) {
-            return true;
+            if (cursor != null && cursor.getCount() > 0 && cursor.moveToFirst()) {
+                return true;
+            }
+
+        } finally {
+            if (cursor != null) cursor.close();
         }
 
         return false;
     }
 
     public void deletePair(ContactGroupPair pair) {
-        database.delete(BackupSQLiteHelper.TABLE_BACKUP, BackupSQLiteHelper.COLUMN_ID + " = " + pair.id, null);
+        database.delete(BackupSQLiteHelper.TABLE_BACKUP, BackupSQLiteHelper.COLUMN_ID + " =?", new String[]{String.valueOf(pair.id)});
     }
 
     public void dropTable() {

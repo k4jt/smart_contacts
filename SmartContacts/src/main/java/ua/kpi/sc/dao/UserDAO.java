@@ -53,18 +53,22 @@ public class UserDAO {
     }
 
     public boolean checkUser(User user) {
-        Cursor cursor = database.query(
-                UserSQLiteHelper.TABLE_USER,
-                new String[]{UserSQLiteHelper.COLUMN_PASSWORD},
-                UserSQLiteHelper.COLUMN_LOGIN + " = '" + user.getLogin() + "'",
-                null, null, null, null);
+        Cursor cursor = null;
+        try {
+            cursor = database.query(
+                    UserSQLiteHelper.TABLE_USER,
+                    new String[]{UserSQLiteHelper.COLUMN_PASSWORD},
+                    UserSQLiteHelper.COLUMN_LOGIN + " =?",
+                    new String[]{user.getLogin()}, null, null, null);
 
-        if(cursor.moveToFirst())
-        {
-            int pass = cursor.getInt(0);
-            return pass == user.getPassword();
-        } else {
-            return false;
+            if(cursor != null && cursor.getCount() > 0 && cursor.moveToFirst()) {
+                int pass = cursor.getInt(0);
+                return pass == user.getPassword();
+            } else {
+                return false;
+            }
+        } finally {
+            if (cursor != null) cursor.close();
         }
     }
 
@@ -81,56 +85,80 @@ public class UserDAO {
     }
 
     public User getUserByLogin(String login) {
-        Cursor cursor = database.query(
-                UserSQLiteHelper.TABLE_USER,
-                UserSQLiteHelper.ALL_COLUMNS,
-                UserSQLiteHelper.COLUMN_LOGIN + " = '" + login + "'",
-                null, null, null, null);
+        Cursor cursor = null;
+        try {
+            cursor = database.query(
+                    UserSQLiteHelper.TABLE_USER,
+                    UserSQLiteHelper.ALL_COLUMNS,
+                    UserSQLiteHelper.COLUMN_LOGIN + " =?",
+                    new String[]{login}, null, null, null);
 
-        if (cursor.moveToFirst()) {
-            return getUserFromCursor(cursor);
+            if (cursor != null && cursor.getCount() > 0 && cursor.moveToFirst()) {
+                return getUserFromCursor(cursor);
+            }
+
+        } finally {
+            if (cursor != null) cursor.close();
         }
 
         return null;
     }
 
     public boolean isLoginExist(String login) {
-        Cursor cursor = database.query(
-                UserSQLiteHelper.TABLE_USER,
-                UserSQLiteHelper.ALL_COLUMNS,
-                UserSQLiteHelper.COLUMN_LOGIN + " = '" + login + "'",
-                null, null, null, null);
 
-        if (cursor.moveToFirst()) {
-            return true;
+        Cursor cursor = null;
+        try {
+            cursor = database.query(
+                    UserSQLiteHelper.TABLE_USER,
+                    UserSQLiteHelper.ALL_COLUMNS,
+                    UserSQLiteHelper.COLUMN_LOGIN + " =?",
+                    new String[]{login}, null, null, null);
+
+            if (cursor != null && cursor.getCount() > 0 && cursor.moveToFirst()) {
+                return true;
+            }
+        } finally {
+            if (cursor != null) cursor.close();
         }
 
         return false;
     }
 
     public boolean isEmailExist(String email) {
-        Cursor cursor = database.query(
-                UserSQLiteHelper.TABLE_USER,
-                UserSQLiteHelper.ALL_COLUMNS,
-                UserSQLiteHelper.COLUMN_EMAIL + " = '" + email + "'",
-                null, null, null, null);
+        Cursor cursor = null;
+        try {
+            cursor = database.query(
+                    UserSQLiteHelper.TABLE_USER,
+                    UserSQLiteHelper.ALL_COLUMNS,
+                    UserSQLiteHelper.COLUMN_EMAIL + " =?",
+                    new String[]{email}, null, null, null);
 
-        if (cursor.moveToFirst()) {
-            return true;
+            if (cursor != null && cursor.getCount() > 0 && cursor.moveToFirst()) {
+                return true;
+            }
+
+        } finally {
+            if (cursor != null) cursor.close();
         }
 
         return false;
     }
 
     public User getUserById(long id) {
-        Cursor cursor = database.query(
-                UserSQLiteHelper.TABLE_USER,
-                UserSQLiteHelper.ALL_COLUMNS,
-                UserSQLiteHelper.COLUMN_ID + " = " + id,
-                null, null, null, null);
+        Cursor cursor = null;
+        try {
+            cursor = database.query(
+                    UserSQLiteHelper.TABLE_USER,
+                    UserSQLiteHelper.ALL_COLUMNS,
+                    UserSQLiteHelper.COLUMN_ID + " =?",
+                    new String[]{String.valueOf(id)}, null, null, null);
 
-        if (cursor.moveToFirst()) {
-            return getUserFromCursor(cursor);
+            if (cursor != null && cursor.getCount() > 0 && cursor.moveToFirst()) {
+                return getUserFromCursor(cursor);
+            }
+
+        } finally {
+            if (cursor != null) cursor.close();
         }
 
         return null;
