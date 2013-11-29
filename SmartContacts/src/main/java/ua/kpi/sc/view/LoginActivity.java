@@ -19,6 +19,7 @@ import android.widget.TextView;
 
 import ua.kpi.sc.R;
 import ua.kpi.sc.control.UserControl;
+import ua.kpi.sc.dao.ContactDAO;
 import ua.kpi.sc.dao.DB;
 import ua.kpi.sc.model.User;
 
@@ -27,14 +28,6 @@ import ua.kpi.sc.model.User;
  * well.
  */
 public class LoginActivity extends Activity {
-    /**
-     * A dummy authentication store containing known user names and passwords.
-     * TODO: remove after connecting to a real authentication system.
-     */
-    private static final String[] DUMMY_CREDENTIALS = new String[]{
-            "foo@example.com:hello",
-            "bar@example.com:world"
-    };
 
     /**
      * The default email to populate the email field with.
@@ -62,10 +55,15 @@ public class LoginActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_login);
 
+        final Activity activity = this;
         DB.createTables(getApplicationContext());
+        Thread t = new Thread(){
+            public void run() {
+                ContactDAO.getInstance(activity);
+            }
+        };
 
         mUserControl = new UserControl(this);
 
@@ -97,8 +95,8 @@ public class LoginActivity extends Activity {
             }
         });
 
+
         Button register = (Button)findViewById(R.id.register_button);
-        final Activity activity = this;
         register.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -217,8 +215,6 @@ public class LoginActivity extends Activity {
     public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
         @Override
         protected Boolean doInBackground(Void... params) {
-            // TODO: attempt authentication against a network service.
-
             try {
                 // Simulate network access.
                 Thread.sleep(2000);

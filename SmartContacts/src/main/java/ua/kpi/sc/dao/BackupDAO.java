@@ -79,7 +79,14 @@ public class BackupDAO {
     }
 
     public void dropTable() {
-        backupHelper.dropTable(database);
+        try {
+            open();
+            backupHelper.dropTable(database);
+        }catch (SQLiteException e) {
+            e.printStackTrace();
+        } finally {
+            close();
+        }
     }
 
 }

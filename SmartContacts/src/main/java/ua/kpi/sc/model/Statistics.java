@@ -48,7 +48,7 @@ public class Statistics {
     private void setTheMostRecentDate(Date date) {
         if (theMostRecent == null) {
             theMostRecent = date;
-        } else if (theMostRecent.after(date)) {
+        } else if (theMostRecent.before(date)) {
             theMostRecent = date;
         }
     }
@@ -56,7 +56,7 @@ public class Statistics {
     private void setTheMostPassedDate(Date date) {
         if (theMostPassed == null) {
             theMostPassed = date;
-        } else if (theMostPassed.before(date)) {
+        } else if (theMostPassed.after(date)) {
             theMostPassed = date;
         }
     }

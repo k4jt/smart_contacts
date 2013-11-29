@@ -8,8 +8,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.util.Map;
+
 import ua.kpi.sc.control.BackupGroups;
 import ua.kpi.sc.R;
+import ua.kpi.sc.control.CallStatistics;
+import ua.kpi.sc.model.Statistics;
 
 public class MainActivity extends Activity {
 
@@ -27,14 +31,20 @@ public class MainActivity extends Activity {
         TextView welcome = (TextView)findViewById(R.id.main_welcome);
         welcome.setText("Welcome, " + userName + "!");
 
+
         backup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
+                CallStatistics callStatistics = new CallStatistics(activity);
+                Map<String, Statistics> statistics = callStatistics.getStatistics();
+
+                String report = "Collect statistics for " + statistics.size() + " contacts.";
+
                 AlertDialog dlgAlert  = new AlertDialog.Builder(activity).create();
                 dlgAlert.setTitle("Backup");
                 if (backupGroups.isUserDidBackup(userId)) {
-                    dlgAlert.setMessage("You had already saved your contacts");
+                    dlgAlert.setMessage("You had already saved your contacts. " + report);
                 } else {
                     int pairs = backupGroups.makeBackup(userId);
                     dlgAlert.setMessage("Saved " + pairs + " contacts");

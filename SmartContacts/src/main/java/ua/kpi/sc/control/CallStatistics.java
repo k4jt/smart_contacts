@@ -13,6 +13,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import ua.kpi.sc.dao.ContactDAO;
 import ua.kpi.sc.model.Statistics;
 
 /**
@@ -20,6 +21,7 @@ import ua.kpi.sc.model.Statistics;
  */
 public class CallStatistics {
 
+    private ContactDAO contactDAO;
     private Activity activity;
     private static String columns[] = {
             CallLog.Calls._ID,
@@ -28,40 +30,52 @@ public class CallStatistics {
             CallLog.Calls.DURATION,
             CallLog.Calls.TYPE};
 
+    private int phoneNumberColumnIndx;
+    private int dateColumnIndx;
+    private int callDurationColumnIndx;
+
     public CallStatistics(Activity activity) {
         this.activity = activity;
+        contactDAO = ContactDAO.getInstance(activity);
     }
 
+    private void addStatisticsFromCursor(Cursor callCursor, Map<String, Statistics> statistics) {
+        String phNumber = callCursor.getString(phoneNumberColumnIndx);
+        int callDuration = Integer.parseInt(callCursor.getString(callDurationColumnIndx));
+        Date callDayTime = new Date(Long.parseLong(callCursor.getString(dateColumnIndx)));
+        String contacId = contactDAO.getContactId(phNumber);
 
-    public Map<Long, Statistics> getStatistics() {
+        if (contacId != null && statistics.containsKey(contacId)) {
+            statistics.get(contacId).addInfo(callDayTime, callDuration);
+        } else if (contacId != null && callDuration > 0) {
+            Statistics info = new Statistics();
+            info.addInfo(callDayTime, callDuration);
+            statistics.put(contacId, info);
+        }
+    }
 
-        /*@TargetApi(Build.VERSION_CODES.HONEYCOMB)
-        CursorLoader callCursorLoader = new CursorLoader(activity.getApplicationContext(),
-                CallLog.Calls.CONTENT_URI, columns, null, null, "Calls._ID DESC");
-        */
+    public Map<String, Statistics> getStatistics() {
+        Map<String, Statistics> statistics = new HashMap<String, Statistics>();
 
-        Cursor callCursor = activity.managedQuery(CallLog.Calls.CONTENT_URI, columns, null, null, "Calls._ID DESC");
+        Cursor callCursor = null;
 
-        int number = callCursor.getColumnIndex(CallLog.Calls.NUMBER);
-        //int type = callCursor.getColumnIndex(CallLog.Calls.TYPE);
-        int date = callCursor.getColumnIndex(CallLog.Calls.DATE);
-        int duration = callCursor.getColumnIndex(CallLog.Calls.DURATION);
+        try {
+            callCursor  = activity.managedQuery(CallLog.Calls.CONTENT_URI, columns, null, null, null);
 
-        Map<Long, Statistics> statistics = new HashMap<Long, Statistics>();
+            if (callCursor != null && callCursor.getCount() > 0 /*&& callCursor.moveToFirst()*/) {
 
-        while (callCursor.moveToNext()) {
-            long phNumber = Long.parseLong(callCursor.getString(number));
-            //String callType = callCursor.getString(type);
-            Date callDayTime = new Date(Long.valueOf(callCursor.getString(date)));
-            int callDuration = Integer.parseInt(callCursor.getString(duration));
+                phoneNumberColumnIndx = callCursor.getColumnIndex(CallLog.Calls.NUMBER);
+                dateColumnIndx = callCursor.getColumnIndex(CallLog.Calls.DATE);
+                callDurationColumnIndx = callCursor.getColumnIndex(CallLog.Calls.DURATION);
 
-            if (statistics.containsKey(phNumber)) {
-                statistics.get(phNumber).addInfo(callDayTime, callDuration);
-            } else {
-                Statistics info = new Statistics();
-                info.addInfo(callDayTime, callDuration);
-                statistics.put(phNumber, info);
+                //addStatisticsFromCursor(callCursor, statistics);
+                while (callCursor.moveToNext()) {
+                    addStatisticsFromCursor(callCursor, statistics);
+                }
             }
+
+        } finally {
+            if (callCursor != null) callCursor.close();
         }
 
         return statistics;

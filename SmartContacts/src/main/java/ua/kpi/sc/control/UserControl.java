@@ -1,6 +1,7 @@
 package ua.kpi.sc.control;
 
 import android.app.Activity;
+import android.content.Context;
 import android.database.sqlite.SQLiteException;
 
 import ua.kpi.sc.dao.UserDAO;
@@ -13,8 +14,8 @@ public class UserControl {
 
     private UserDAO dao;
 
-    public UserControl(Activity activity) {
-        dao = new UserDAO(activity.getApplicationContext());
+    public UserControl(Context context) {
+        dao = new UserDAO(context);
     }
 
     public long addUser(User user) {

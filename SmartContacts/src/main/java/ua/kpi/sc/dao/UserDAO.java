@@ -165,7 +165,14 @@ public class UserDAO {
     }
 
     public void dropTable() {
-        userHelper.dropTable(database);
+        try {
+            open();
+            userHelper.dropTable(database);
+        } catch (SQLiteException e) {
+            e.printStackTrace();
+        } finally {
+            close();
+        }
     }
 
 }
