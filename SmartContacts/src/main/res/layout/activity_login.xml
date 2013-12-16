@@ -80,6 +80,15 @@
                 android:paddingRight="22dp"
                 android:layout_gravity="right" />
 
+            <!--test button-->
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="test SMS (temporary button)"
+                android:id="@+id/sms_button"
+                android:layout_gravity="center_horizontal|top" />
+
+
         </LinearLayout>
 
     </ScrollView>

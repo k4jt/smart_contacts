@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/SmartContacts.iml" filepath="$PROJECT_DIR$/SmartContacts.iml" />
       <module fileurl="file://$PROJECT_DIR$/SmartContacts/SmartContacts-SmartContacts.iml" filepath="$PROJECT_DIR$/SmartContacts/SmartContacts-SmartContacts.iml" />
+      <module fileurl="file://$PROJECT_DIR$/smart_contacts.iml" filepath="$PROJECT_DIR$/smart_contacts.iml" />
     </modules>
   </component>
 </project>

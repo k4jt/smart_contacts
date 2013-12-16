@@ -9,6 +9,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.View;
@@ -17,11 +18,17 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import ua.kpi.sc.R;
 import ua.kpi.sc.control.UserControl;
 import ua.kpi.sc.dao.ContactDAO;
 import ua.kpi.sc.dao.DB;
 import ua.kpi.sc.model.User;
+import ua.kpi.sc.sms.SmsPersonStatistics;
+
+import static ua.kpi.sc.sms.SmsUtils.collectStatistics;
 
 /**
  * Activity which displays a login screen to the user, offering registration as
@@ -33,6 +40,7 @@ public class LoginActivity extends Activity {
      * The default email to populate the email field with.
      */
     public static final String EXTRA_EMAIL = "com.example.android.authenticatordemo.extra.EMAIL";
+    private static final String LOG_TAG = "LoginActivity";
 
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
@@ -53,7 +61,7 @@ public class LoginActivity extends Activity {
     private final Activity mActivity = this;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
@@ -104,6 +112,24 @@ public class LoginActivity extends Activity {
                 startActivity(intent);
             }
         });
+
+
+        //Test code for sms
+        Button sms_button = (Button) findViewById(R.id.sms_button);
+        sms_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                testClick(LoginActivity.this);
+            }
+        });
+    }
+
+    private void testClick(Activity activity) {
+        HashMap<String, SmsPersonStatistics> lstSms = collectStatistics(activity);
+
+        for (Map.Entry entry : lstSms.entrySet()) {
+            Log.d(LOG_TAG, entry.getValue() + " " + entry.getKey());
+        }
     }
 
 
