@@ -15,8 +15,6 @@ import ua.kpi.sc.sms.SmsPersonStatistics;
 
 public class ClusteringUtils {
 
-    private final static int CONTACTS_SIZE = 100;
-
     /**
      * @throws java.io.IOException
      */
@@ -46,25 +44,24 @@ public class ClusteringUtils {
         for (Dataset contactGroup : clusteredContactsGroups) {
             System.out.println("========================== CLASTER " + (clusterNum++) + " ========================== ");
             for (Instance contact : contactGroup) {
-                System.out.println("== CONTACT ");
+                System.out.println("== CONTACT " + contact.classValue());
                 for (Double score : contact) {
                     System.out.printf("%.3f ", score);
                 }
                 System.out.println();
             }
         }
-
     }
 
     private static Instance getFeatureVector(Map.Entry contact) {
         String id = (String) contact.getKey();
         SmsPersonStatistics stat = (SmsPersonStatistics) contact.getValue();
-        double callScore1 = stat.inboxSmsCount;
-        double callScore2 = stat.inboxTotalSymbols;
-        double smsScore1 = stat.sentSmsCount;
-        double smsScore2 = stat.sentTotalSymbols;
+        double callScore1 = 0;
+        double callScore2 = 0;
+        double smsScore1 = 3 * stat.sentSmsCount + stat.inboxSmsCount; //weighted total count
+        double smsScore2 = 3 * stat.sentTotalSymbols + stat.inboxTotalSymbols; //weighted total symbols
         double[] values = new double[]{callScore1, callScore2, smsScore1, smsScore2};
-        Instance featureVector = new DenseInstance(values);
+        Instance featureVector = new DenseInstance(values, id);
         return featureVector;
     }
 }
