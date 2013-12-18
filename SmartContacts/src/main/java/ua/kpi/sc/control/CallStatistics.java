@@ -33,6 +33,9 @@ public class CallStatistics {
     private int phoneNumberColumnIndx;
     private int dateColumnIndx;
     private int callDurationColumnIndx;
+    private int typeColumnIndx;
+
+    private static final int PRIORITY_FACTOR = 3;
 
     public CallStatistics(Activity activity) {
         this.activity = activity;
@@ -44,6 +47,9 @@ public class CallStatistics {
         int callDuration = Integer.parseInt(callCursor.getString(callDurationColumnIndx));
         Date callDayTime = new Date(Long.parseLong(callCursor.getString(dateColumnIndx)));
         String contacId = contactDAO.getContactId(phNumber);
+        int type = Integer.parseInt(callCursor.getString(typeColumnIndx));
+
+        if (type == CallLog.Calls.OUTGOING_TYPE) callDuration *= PRIORITY_FACTOR;
 
         if (contacId != null && statistics.containsKey(contacId)) {
             statistics.get(contacId).addInfo(callDayTime, callDuration);
@@ -67,6 +73,7 @@ public class CallStatistics {
                 phoneNumberColumnIndx = callCursor.getColumnIndex(CallLog.Calls.NUMBER);
                 dateColumnIndx = callCursor.getColumnIndex(CallLog.Calls.DATE);
                 callDurationColumnIndx = callCursor.getColumnIndex(CallLog.Calls.DURATION);
+                typeColumnIndx = callCursor.getColumnIndex(CallLog.Calls.TYPE);
 
                 //addStatisticsFromCursor(callCursor, statistics);
                 while (callCursor.moveToNext()) {

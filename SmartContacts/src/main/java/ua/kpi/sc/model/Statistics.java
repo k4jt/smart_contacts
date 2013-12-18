@@ -20,6 +20,14 @@ public class Statistics {
     private int totalCount;
     private long totalAmount;
 
+    public int getTotalCount() {
+        return totalCount;
+    }
+
+    public long getTotalAmount() {
+        return totalAmount;
+    }
+
     public double getFrequency() {
         double days = convertMillisecondsToDays(theMostRecent.getTime() - theMostPassed.getTime());
         if (days == 0.0f) return 0.0f;
@@ -33,6 +41,10 @@ public class Statistics {
 
     private double convertMillisecondsToDays(long timeInMillis) {
         return timeInMillis / MILLIS_IN_DAY;
+    }
+
+    public void addInfo(String date, int amount) {
+        addInfo(new Date(Long.parseLong(date)), amount);
     }
 
     public void addInfo(Date date, int amount) {
