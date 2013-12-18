@@ -18,6 +18,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,6 +29,7 @@ import ua.kpi.sc.dao.DB;
 import ua.kpi.sc.model.User;
 import ua.kpi.sc.sms.SmsPersonStatistics;
 
+import static ua.kpi.sc.clustering.ClusteringUtils.clustereIt;
 import static ua.kpi.sc.sms.SmsUtils.collectStatistics;
 
 /**
@@ -129,6 +131,12 @@ public class LoginActivity extends Activity {
 
         for (Map.Entry entry : lstSms.entrySet()) {
             Log.d(LOG_TAG, entry.getValue() + " " + entry.getKey());
+        }
+
+        try {
+            clustereIt(lstSms);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

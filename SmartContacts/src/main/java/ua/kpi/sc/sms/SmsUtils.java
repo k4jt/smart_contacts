@@ -38,7 +38,8 @@ public class SmsUtils {
                 if (c.getString(c.getColumnIndexOrThrow("type")).contains("1")) {
                     //we need to store sms only for existing contacts
                     if (person == null) {
-                        //continue;
+                        c.moveToNext();
+                        continue;
                     }
                     folderName = INBOX;
                 } else {
