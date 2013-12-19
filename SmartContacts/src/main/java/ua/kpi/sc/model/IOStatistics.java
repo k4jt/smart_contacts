@@ -7,6 +7,11 @@ public class IOStatistics {
 
     private Statistics input, output;
 
+    {
+        input = new Statistics();
+        output = new Statistics();
+    }
+
     public void addInbox(String date, int totalAmount) {
         input.addInfo(date, totalAmount);
     }
