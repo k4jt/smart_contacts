@@ -26,6 +26,7 @@ import ua.kpi.sc.control.StatisticsCollector;
 import ua.kpi.sc.control.UserControl;
 import ua.kpi.sc.dao.ContactDAO;
 import ua.kpi.sc.dao.DB;
+import ua.kpi.sc.dao.Group;
 import ua.kpi.sc.model.PersonStatistics;
 import ua.kpi.sc.model.User;
 
@@ -126,7 +127,11 @@ public class LoginActivity extends Activity {
     }
 
     private void testClick(Activity activity) {
-        StatisticsCollector collector = new StatisticsCollector(activity);
+
+        Group group = new Group(activity);
+        group.createGroup("test_group");
+
+        /*StatisticsCollector collector = new StatisticsCollector(activity);
         Map<String, PersonStatistics> lstSms = collector.getStatistics();
 
         for (Map.Entry entry : lstSms.entrySet()) {
@@ -137,7 +142,7 @@ public class LoginActivity extends Activity {
             clustereIt(lstSms);
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
     }
 
 
