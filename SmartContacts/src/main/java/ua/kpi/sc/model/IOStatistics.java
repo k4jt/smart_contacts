@@ -42,7 +42,7 @@ public class IOStatistics {
     }
 
     /**
-     * the same as {@link SmsPersonStatistics#inboxTotalSymbols} but for
+     * the same as {@link PersonStatistics#inboxTotalSymbols} but for
      * output sms/calls (outbox)
      */
     public long getTotalOutputAmount() {
@@ -50,7 +50,7 @@ public class IOStatistics {
     }
 
     /**
-     * the same as {@link SmsPersonStatistics#inboxSmsCount} but for
+     * the same as {@link PersonStatistics#inboxSmsCount} but for
      * output sms (outbox)
      */
     public int getTotalOutputCount() {

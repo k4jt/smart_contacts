@@ -11,14 +11,15 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import ua.kpi.sc.sms.SmsPersonStatistics;
+import ua.kpi.sc.model.IOStatistics;
+import ua.kpi.sc.model.PersonStatistics;
 
 public class ClusteringUtils {
 
     /**
      * @throws java.io.IOException
      */
-    public static void clustereIt(HashMap<String, SmsPersonStatistics> lstSms) throws IOException {
+    public static void clustereIt(HashMap<String, IOStatistics> lstSms) throws IOException {
 
         /* Make dataset */
         Dataset data = new DefaultDataset();
@@ -55,7 +56,7 @@ public class ClusteringUtils {
 
     private static Instance getFeatureVector(Map.Entry contact) {
         String id = (String) contact.getKey();
-        SmsPersonStatistics stat = (SmsPersonStatistics) contact.getValue();
+        PersonStatistics stat = (PersonStatistics) contact.getValue();
         double callScore1 = 0;
         double callScore2 = 0;
         double smsScore1 = 3 * stat.sentSmsCount + stat.inboxSmsCount; //weighted total count

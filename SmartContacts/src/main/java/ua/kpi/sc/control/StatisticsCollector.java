@@ -4,15 +4,18 @@ import android.app.Activity;
 import android.content.ContentResolver;
 import android.database.Cursor;
 import android.net.Uri;
+import android.provider.CallLog;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import ua.kpi.sc.dao.ContactDAO;
-import ua.kpi.sc.model.sms.FolderType;
-import ua.kpi.sc.model.sms.Sms;
-import ua.kpi.sc.model.sms.SmsStatistics;
+import ua.kpi.sc.model.FolderType;
+import ua.kpi.sc.model.IOStatistics;
+import ua.kpi.sc.model.PersonStatistics;
+import ua.kpi.sc.model.Sms;
 
 import static android.util.Log.d;
 
@@ -22,17 +25,83 @@ import static android.util.Log.d;
  */
 public class StatisticsCollector {
 
-    public static List<Sms> getAllSms(Activity mActivity) {
+    private ContactDAO contactDAO;
+    private Activity activity;
+    private static String callColumns[] = {
+            CallLog.Calls._ID,
+            CallLog.Calls.NUMBER,
+            CallLog.Calls.DATE,
+            CallLog.Calls.DURATION,
+            CallLog.Calls.TYPE};
+
+    public StatisticsCollector(Activity activity) {
+        this.activity = activity;
+        contactDAO = ContactDAO.getInstance(activity);
+
+        // check if phones loading completed
+        while (!contactDAO.isFinishLoading()) try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private Map<String, IOStatistics> collectCallStatistics() {
+        Map<String, IOStatistics> statistics = new HashMap<String, IOStatistics>();
+
+        Cursor callCursor = null;
+
+        try {
+            callCursor  = activity.managedQuery(CallLog.Calls.CONTENT_URI, callColumns, null, null, null);
+
+            if (callCursor != null && callCursor.getCount() > 0 /*&& callCursor.moveToFirst()*/) {
+
+               int phoneNumberColumnIndex = callCursor.getColumnIndex(CallLog.Calls.NUMBER);
+               int dateColumnIndex = callCursor.getColumnIndex(CallLog.Calls.DATE);
+               int callDurationColumnIndex = callCursor.getColumnIndex(CallLog.Calls.DURATION);
+               int typeColumnIndex = callCursor.getColumnIndex(CallLog.Calls.TYPE);
+
+                while (callCursor.moveToNext()) {
+
+                    String contactId = contactDAO.getContactId(callCursor.getString(phoneNumberColumnIndex));
+                    //we need to store calls only for existing contacts
+                    if (contactId == null) continue;
+
+                    int callDuration = Integer.parseInt(callCursor.getString(callDurationColumnIndex));
+                    //we need to store meaningful calls
+                    if (callDuration == 0) continue;
+
+                    String callDayTime = callCursor.getString(dateColumnIndex);
+                    int callType = Integer.parseInt(callCursor.getString(typeColumnIndex));
+
+                    IOStatistics callStat = statistics.get(contactId);
+                    if (callStat == null) {
+                        callStat = new IOStatistics();
+                        statistics.put(contactId, callStat);
+                    }
+
+                    callStat.addInfo(callDayTime, callDuration, (callType == CallLog.Calls.INCOMING_TYPE));
+                }
+            }
+
+        } finally {
+            if (callCursor != null) callCursor.close();
+        }
+
+        return statistics;
+    }
+
+    private List<Sms> getAllSms() {
         List<Sms> lstSms = new ArrayList<Sms>();
         Uri message = Uri.parse("content://sms/");
-        ContentResolver cr = mActivity.getContentResolver();
+        ContentResolver cr = activity.getContentResolver();
 
         Cursor c = null;
 
         try {
             c = cr.query(message, null, null, null, null);
             if (c != null) {
-                mActivity.startManagingCursor(c);
+                //activity.startManagingCursor(c);
                 int totalSMS = c.getCount();
 
                 if (c.moveToFirst()) {
@@ -75,38 +144,121 @@ public class StatisticsCollector {
         return lstSms;
     }
 
-    public static HashMap<String, SmsStatistics> collectStatistics(Activity mActivity) {
-        List<Sms> lstSms = getAllSms(mActivity);
+    private Map<String, IOStatistics> collectSmsStatistics() {
+        List<Sms> lstSms = getAllSms();
 
         //contactId --> smsStatistics
-        HashMap<String, SmsStatistics> smsStatistics = new HashMap<String, SmsStatistics>();
-
-        ContactDAO contactDAO = ContactDAO.getInstance(mActivity);
-        // check if phones loading completed
-        while (!contactDAO.isFinishLoading()) try {
-            Thread.sleep(100);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        Map<String, IOStatistics> smsStatistics = new HashMap<String, IOStatistics>();
 
         for (Sms sms : lstSms) {
-            String phoneNumber = sms.getAddress();
-            String id = contactDAO.getContactId(phoneNumber);
-            SmsStatistics smsStat = smsStatistics.get(id);
-            //if not exist create Entry in Map
+            String contactId = contactDAO.getContactId(sms.getAddress());
+
+            if (contactId == null) continue;
+
+            IOStatistics smsStat = smsStatistics.get(contactId);
             if (smsStat == null) {
-                smsStat = new SmsStatistics();
-                smsStatistics.put(id, smsStat);
+                smsStat = new IOStatistics();
+                smsStatistics.put(contactId, smsStat);
             }
-            //if recieved
-            if (sms.getFolderType() == FolderType.INBOX) {
-                smsStat.addInboxSms(sms.getTime(), sms.getMsg().length());
-            } else { //if sent
-                smsStat.addSentSms(sms.getTime(), sms.getMsg().length());
-            }
+
+            smsStat.addInfo(sms.getTime(), sms.getMsg().length(), (sms.getFolderType() == FolderType.INBOX));
         }
 
         return smsStatistics;
     }
+
+    public Map<String, PersonStatistics> getStatistics() {
+        StatisticsThread smsThread = new StatisticsThread(StatisticsType.SMS);
+        smsThread.start();
+        StatisticsThread callThread = new StatisticsThread(StatisticsType.CALL);
+        callThread.start();
+
+        if (smsThread.isAlive()) {
+            try {
+                smsThread.join();
+            } catch (InterruptedException e) {}
+        }
+
+        if (callThread.isAlive()) {
+            try {
+                callThread.join();
+            } catch (InterruptedException e) {}
+        }
+
+        return merge(smsThread.statistics, callThread.statistics);
+    }
+
+    private Map<String, PersonStatistics> merge(Map<String, IOStatistics> smsStatistics, Map<String, IOStatistics> callStatistics) {
+        Map<String, PersonStatistics> statistics = new HashMap<String, PersonStatistics>();
+
+        if (smsStatistics.size() >= callStatistics.size()) {
+            for (Map.Entry smsEntry : smsStatistics.entrySet()) {
+                String id = (String)smsEntry.getKey();
+                IOStatistics smsData = (IOStatistics)smsEntry.getValue();
+                IOStatistics callData = callStatistics.get(id);
+
+                PersonStatistics stat = new PersonStatistics();
+                statistics.put(id, stat);
+                stat.inboxSmsCount = smsData.getTotalInputCount();
+                stat.inboxTotalSymbols = smsData.getTotalInputAmount();
+                stat.sentSmsCount = smsData.getTotalOutputCount();
+                stat.sentTotalSymbols = smsData.getTotalOutputAmount();
+
+                if (callData != null) {
+                    stat.incomingCallsCount = callData.getTotalInputCount();
+                    stat.incomingTotalDuration = callData.getTotalInputAmount();
+                    stat.outgoingCallsCount = callData.getTotalOutputCount();
+                    stat.outgoingTotalDuration = callData.getTotalOutputAmount();
+                }
+            }
+        } else {
+            for (Map.Entry callEntry : callStatistics.entrySet()) {
+                String id = (String)callEntry.getKey();
+                IOStatistics callData = (IOStatistics)callEntry.getValue();
+                IOStatistics smsData = smsStatistics.get(id);
+
+                PersonStatistics stat = new PersonStatistics();
+                statistics.put(id, stat);
+                if (smsData != null) {
+                    stat.inboxSmsCount = smsData.getTotalInputCount();
+                    stat.inboxTotalSymbols = smsData.getTotalInputAmount();
+                    stat.sentSmsCount = smsData.getTotalOutputCount();
+                    stat.sentTotalSymbols = smsData.getTotalOutputAmount();
+                }
+
+                stat.incomingCallsCount = callData.getTotalInputCount();
+                stat.incomingTotalDuration = callData.getTotalInputAmount();
+                stat.outgoingCallsCount = callData.getTotalOutputCount();
+                stat.outgoingTotalDuration = callData.getTotalOutputAmount();
+            }
+        }
+
+        return statistics;
+    }
+
+    public enum StatisticsType {
+        SMS, CALL
+    }
+
+    public class StatisticsThread extends Thread {
+
+        Map<String, IOStatistics> statistics = null;
+        private StatisticsType type;
+
+        public StatisticsThread(StatisticsType type) {
+            this.type = type;
+        }
+
+        @Override
+        public void run() {
+            if (type == StatisticsType.SMS)
+                statistics = collectSmsStatistics();
+            else
+                statistics = collectCallStatistics();
+        }
+
+    }
+
+
 }
 

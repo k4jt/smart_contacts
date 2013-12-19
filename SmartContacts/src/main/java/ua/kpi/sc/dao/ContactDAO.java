@@ -22,6 +22,7 @@ public class ContactDAO {
 
     private static Activity activity;
     private static ContactDAO instance;
+    private boolean finishLoading = false;
 
     public static ContactDAO getInstance(Activity inputActivity) {
         activity = inputActivity;
@@ -98,6 +99,8 @@ public class ContactDAO {
             if (cursor != null) cursor.close();
             close();
         }
+
+        finishLoading = true;
     }
 
     public static String normalizePhoneNumber(String phoneNumber) {
@@ -117,7 +120,9 @@ public class ContactDAO {
        return result;
     }
 
-
+    public boolean isFinishLoading() {
+        return finishLoading;
+    }
 
 
 }
