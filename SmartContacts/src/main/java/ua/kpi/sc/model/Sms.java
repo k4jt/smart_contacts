@@ -1,4 +1,4 @@
-package ua.kpi.sc.sms;
+package ua.kpi.sc.model;
 
 /**
  * Created by Smolin on 14.12.13.
@@ -9,7 +9,7 @@ public class Sms {
     private String _msg;
     private String _readState; //"0" for have not read sms and "1" for have read sms
     private String _time;
-    private String _folderName;
+    private FolderType _folderType;
     private String _person;
 
     public String getId() {
@@ -33,9 +33,12 @@ public class Sms {
     }
 
     public String getFolderName() {
-        return _folderName;
+        return _folderType.toString();
     }
 
+    public FolderType getFolderType() {
+        return _folderType;
+    }
 
     public void setId(String id) {
         _id = id;
@@ -57,8 +60,8 @@ public class Sms {
         _time = time;
     }
 
-    public void setFolderName(String folderName) {
-        _folderName = folderName;
+    public void setFolderName(FolderType folderType) {
+        _folderType = folderType;
     }
 
     @Override
@@ -69,7 +72,7 @@ public class Sms {
                 ", _msg='" + _msg + '\'' +
                 ", _readState='" + _readState + '\'' +
                 ", _time='" + _time + '\'' +
-                ", _folderName='" + _folderName + '\'' +
+                ", _folderName='" + _folderType.toString() + '\'' +
                 ", _person='" + _person + '\'' +
                 '}';
     }

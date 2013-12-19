@@ -1,9 +1,9 @@
-package ua.kpi.sc.sms;
+package ua.kpi.sc.model;
 
 /**
  * Created by Smolin on 15.12.13.
  */
-public class SmsPersonStatistics {
+public class PersonStatistics {
 
     /**
      * number of symbols of all sms recieved (total inbox sms length)
@@ -15,20 +15,20 @@ public class SmsPersonStatistics {
     public int inboxSmsCount;
 
     /**
-     * the same as {@link ua.kpi.sc.sms.SmsPersonStatistics#inboxTotalSymbols} but for
+     * the same as {@link PersonStatistics#inboxTotalSymbols} but for
      * sent sms (outbox)
      */
     public int sentTotalSymbols;
 
     /**
-     * the same as {@link ua.kpi.sc.sms.SmsPersonStatistics#inboxSmsCount} but for
+     * the same as {@link PersonStatistics#inboxSmsCount} but for
      * sent sms (outbox)
      */
     public int sentSmsCount;
 
     @Override
     public String toString() {
-        return "SmsPersonStatistics{" +
+        return "PersonStatistics{" +
                 "inboxTotalSymbols=" + inboxTotalSymbols +
                 ", inboxSmsCount=" + inboxSmsCount +
                 ", sentTotalSymbols=" + sentTotalSymbols +
