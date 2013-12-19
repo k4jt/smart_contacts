@@ -19,10 +19,10 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
 import ua.kpi.sc.R;
+import ua.kpi.sc.control.StatisticsCollector;
 import ua.kpi.sc.control.UserControl;
 import ua.kpi.sc.dao.ContactDAO;
 import ua.kpi.sc.dao.DB;
@@ -30,7 +30,6 @@ import ua.kpi.sc.model.PersonStatistics;
 import ua.kpi.sc.model.User;
 
 import static ua.kpi.sc.clustering.ClusteringUtils.clustereIt;
-import static ua.kpi.sc.control.StatisticsCollector.collectStatistics;
 
 /**
  * Activity which displays a login screen to the user, offering registration as
@@ -127,7 +126,8 @@ public class LoginActivity extends Activity {
     }
 
     private void testClick(Activity activity) {
-        HashMap<String, PersonStatistics> lstSms = collectStatistics(activity);
+        StatisticsCollector collector = new StatisticsCollector(activity);
+        Map<String, PersonStatistics> lstSms = collector.getStatistics();
 
         for (Map.Entry entry : lstSms.entrySet()) {
             Log.d(LOG_TAG, entry.getValue() + " " + entry.getKey());
