@@ -10,10 +10,10 @@ import android.widget.TextView;
 
 import java.util.Map;
 
-import ua.kpi.sc.control.BackupGroups;
 import ua.kpi.sc.R;
-import ua.kpi.sc.control.CallStatistics;
-import ua.kpi.sc.model.Statistics;
+import ua.kpi.sc.control.BackupGroups;
+import ua.kpi.sc.control.StatisticsCollector;
+import ua.kpi.sc.model.PersonStatistics;
 
 public class MainActivity extends Activity {
 
@@ -36,8 +36,8 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
 
-                CallStatistics callStatistics = new CallStatistics(activity);
-                Map<String, Statistics> statistics = callStatistics.getStatistics();
+                StatisticsCollector callStatistics = new StatisticsCollector(activity);
+                Map<String, PersonStatistics> statistics = callStatistics.getStatistics();
 
                 String report = "Collect statistics for " + statistics.size() + " contacts.";
 

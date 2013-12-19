@@ -8,18 +8,17 @@ import net.sf.javaml.core.DenseInstance;
 import net.sf.javaml.core.Instance;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
-import ua.kpi.sc.model.IOStatistics;
 import ua.kpi.sc.model.PersonStatistics;
 
 public class ClusteringUtils {
 
     /**
+     * @param lstSms
      * @throws java.io.IOException
      */
-    public static void clustereIt(HashMap<String, IOStatistics> lstSms) throws IOException {
+    public static void clustereIt(Map<String, PersonStatistics> lstSms) throws IOException {
 
         /* Make dataset */
         Dataset data = new DefaultDataset();
@@ -57,8 +56,8 @@ public class ClusteringUtils {
     private static Instance getFeatureVector(Map.Entry contact) {
         String id = (String) contact.getKey();
         PersonStatistics stat = (PersonStatistics) contact.getValue();
-        double callScore1 = 0;
-        double callScore2 = 0;
+        double callScore1 = 3 * stat.outgoingCallsCount + stat.incomingCallsCount;
+        double callScore2 = 3 * stat.outgoingTotalDuration + stat.incomingTotalDuration;
         double smsScore1 = 3 * stat.sentSmsCount + stat.inboxSmsCount; //weighted total count
         double smsScore2 = 3 * stat.sentTotalSymbols + stat.inboxTotalSymbols; //weighted total symbols
         double[] values = new double[]{callScore1, callScore2, smsScore1, smsScore2};

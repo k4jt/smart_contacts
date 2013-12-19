@@ -7,4 +7,6 @@ public class ContactGroupPair {
     public long id;
     public int contactId;
     public int groupId;
+
+
 }
