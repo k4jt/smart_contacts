@@ -101,9 +101,9 @@ public class ClusteringUtils {
             clusterNum++;
         }
 
-//        for (Map.Entry entry : contactToNameMap.entrySet()) {
-//            System.out.println(entry.getKey() + " " +entry.getValue());
-//        }
+        for (Map.Entry entry : contactToNameMap.entrySet()) {
+            System.out.println(entry.getKey() + " " + entry.getValue());
+        }
 
         return contactToNameMap;
     }
