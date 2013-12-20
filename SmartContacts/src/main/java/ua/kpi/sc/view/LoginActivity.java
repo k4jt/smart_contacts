@@ -69,11 +69,11 @@ public class LoginActivity extends Activity {
 
         final Activity activity = this;
         DB.createTables(getApplicationContext());
-        Thread t = new Thread(){
+        new Thread() {
             public void run() {
-                ContactDAO.getInstance(activity);
+                StatisticsCollector.getInstance(activity);
             }
-        };
+        }.start();
 
         mUserControl = new UserControl(this);
 
@@ -117,13 +117,13 @@ public class LoginActivity extends Activity {
 
 
         //Test code for sms
-        Button sms_button = (Button) findViewById(R.id.sms_button);
+        /*Button sms_button = (Button) findViewById(R.id.sms_button);
         sms_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 testClick(LoginActivity.this);
             }
-        });
+        });*/
     }
 
     private void testClick(Activity activity) {

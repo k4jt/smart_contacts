@@ -35,7 +35,24 @@ public class StatisticsCollector {
             CallLog.Calls.DURATION,
             CallLog.Calls.TYPE};
 
-    public StatisticsCollector(Activity activity) {
+    private Map<String, PersonStatistics> statistics;
+
+    private static StatisticsCollector collectorInstance;
+
+    private boolean finishedStatistics = false;
+
+    public boolean isFinishedStatistics() {
+        return finishedStatistics;
+    }
+
+    public static StatisticsCollector getInstance(Activity activity) {
+        if (collectorInstance == null) {
+            collectorInstance = new StatisticsCollector(activity);
+        }
+        return collectorInstance;
+    }
+
+    private StatisticsCollector(Activity activity) {
         this.activity = activity;
         contactDAO = ContactDAO.getInstance(activity);
 
@@ -45,6 +62,9 @@ public class StatisticsCollector {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
+        statistics = getStatistics();
+        finishedStatistics = true;
     }
 
     private Map<String, IOStatistics> collectCallStatistics() {

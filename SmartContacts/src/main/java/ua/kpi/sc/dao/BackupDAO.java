@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import ua.kpi.sc.model.ContactGroupPair;
@@ -52,6 +53,31 @@ public class BackupDAO {
         values.put(BackupSQLiteHelper.COLUMN_CONTACT_ID, pair.contactId);
         values.put(BackupSQLiteHelper.COLUMN_GROUP_ID, pair.groupId);
         database.insert(BackupSQLiteHelper.TABLE_BACKUP, null, values);
+    }
+
+    public List<ContactGroupPair> getBackup(int userId) {
+        List<ContactGroupPair> pairs = new ArrayList<ContactGroupPair>();
+        Cursor cursor = null;
+        try {
+            cursor = database.query(
+                    BackupSQLiteHelper.TABLE_BACKUP,
+                    BackupSQLiteHelper.ALL_COLUMNS,
+                    BackupSQLiteHelper.COLUMN_USER_ID + " =?",
+                    new String[]{String.valueOf(userId)}, null, null, null);
+
+            if (cursor != null && cursor.getCount() > 0 /*&& cursor.moveToFirst()*/) {
+                while (cursor.moveToNext()) {
+                    ContactGroupPair pair = new ContactGroupPair();
+                    pair.contactId = cursor.getInt(cursor.getColumnIndex(BackupSQLiteHelper.COLUMN_CONTACT_ID));
+                    pair.groupId = cursor.getInt(cursor.getColumnIndex(BackupSQLiteHelper.COLUMN_GROUP_ID));
+                    pairs.add(pair);
+                }
+            }
+        } finally {
+            if (cursor != null) cursor.close();
+        }
+
+        return pairs;
     }
 
     public boolean isUserDidBackup(int userId) {

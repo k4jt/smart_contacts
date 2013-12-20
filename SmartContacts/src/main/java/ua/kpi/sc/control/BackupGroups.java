@@ -39,25 +39,40 @@ public class BackupGroups {
         return result;
     }
 
-    public int makeBackup(int userId) {
-        int addedPairs = 0;
+    public List<ContactGroupPair> makeBackup(int userId) {
+        List<ContactGroupPair> pairs = getGroups();
+        makeBackup(userId, pairs);
+        return pairs;
+    }
+
+    public List<ContactGroupPair> getBackup(int userId) {
+        List<ContactGroupPair> pairs = null;
         try {
             dao.open();
-            List<ContactGroupPair> pairs = getGroups();
-            dao.addPairs(pairs, userId);
-            addedPairs = pairs.size();
+            pairs = dao.getBackup(userId);
         } catch (SQLiteException e) {
             e.printStackTrace();
         } finally {
             dao.close();
         }
-        return addedPairs;
+        return pairs;
+    }
+
+    public void makeBackup(int userId, List<ContactGroupPair> pairs) {
+        try {
+            dao.open();
+            dao.addPairs(pairs, userId);
+        } catch (SQLiteException e) {
+            e.printStackTrace();
+        } finally {
+            dao.close();
+        }
     }
 
     public List<ContactGroupPair> getGroups() {
 
         Cursor dataCursor = null;
-        List<ContactGroupPair> contactGroups = null;
+        List<ContactGroupPair> contactGroups = new ArrayList<ContactGroupPair>();;
 
         try {
             dataCursor = activity.getContentResolver().query(
@@ -70,13 +85,11 @@ public class BackupGroups {
                 new String[]{ContactsContract.CommonDataKinds.GroupMembership.CONTENT_ITEM_TYPE}, null
                 );
 
-            if (dataCursor != null && dataCursor.getCount() > 0 && dataCursor.moveToFirst())
+            if (dataCursor != null && dataCursor.getCount() > 0 /*&& dataCursor.moveToFirst()*/)
             {
-                contactGroups = new ArrayList<ContactGroupPair>();
-
-                while(!dataCursor.isAfterLast()) {
+                while(dataCursor.moveToNext() /*!dataCursor.isAfterLast()*/) {
                     contactGroups.add(getContactFromCursor(dataCursor));
-                    dataCursor.moveToNext();
+                    /*dataCursor.moveToNext();*/
                 }
             }
         } finally {

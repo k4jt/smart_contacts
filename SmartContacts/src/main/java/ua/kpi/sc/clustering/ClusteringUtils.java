@@ -90,7 +90,7 @@ public class ClusteringUtils {
             }
             i++;
         }
-
+        // мапінг айдішника контакта на назву групи
         HashMap<String, String> contactToNameMap = new HashMap<String, String>();
 
         clusterNum = 0;

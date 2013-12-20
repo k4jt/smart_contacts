@@ -24,7 +24,7 @@ public class Group {
         _activity = activity;
     }
 
-    public void createGroup(String groupName)
+    public int createGroup(String groupName)
     {
         ContentResolver cr = _activity.getContentResolver();
         ContentValues groupValues = new ContentValues();
@@ -32,6 +32,19 @@ public class Group {
         groupValues.put(ContactsContract.Groups.GROUP_VISIBLE, 0);
 
         cr.insert(ContactsContract.Groups.CONTENT_URI, groupValues);
+        Cursor c = null;
+        int groupId = 0;
+        try {
+            c = cr.query(ContactsContract.Groups.CONTENT_URI, new String[]{ContactsContract.Groups._ID},
+                    ContactsContract.Groups.TITLE + "=? AND " + ContactsContract.Groups.GROUP_VISIBLE + "=?", new String[]{groupName, "0"}, null);
+            if (c != null && c.getCount() > 0 && c.moveToFirst()) {
+                groupId = Integer.parseInt(c.getString(c.getColumnIndex(ContactsContract.Groups._ID)));
+            }
+        } finally {
+            if (c != null) c.close();
+        }
+
+        return groupId;
     }
 
     public void hideAllGroups() {
@@ -56,6 +69,24 @@ public class Group {
             cr.update(ContactsContract.Groups.CONTENT_URI, groupValues,
                     ContactsContract.Groups._ID + "=?", new String[]{id});
         }
+    }
+
+    public void hideGroup(int groupId) {
+        ContentResolver cr = _activity.getContentResolver();
+
+        ContentValues groupValues = new ContentValues();
+        groupValues.put(ContactsContract.Groups.DELETED, HIDE);
+        cr.update(ContactsContract.Groups.CONTENT_URI, groupValues,
+                ContactsContract.Groups._ID + "=?", new String[]{String.valueOf(groupId)} );
+    }
+
+    public void showGroup(int groupId) {
+        ContentResolver cr = _activity.getContentResolver();
+
+        ContentValues groupValues = new ContentValues();
+        groupValues.put(ContactsContract.Groups.DELETED, SHOW);
+        cr.update(ContactsContract.Groups.CONTENT_URI, groupValues,
+                ContactsContract.Groups._ID + "=?", new String[]{String.valueOf(groupId)} );
     }
 
     public void showAllGroups() {
