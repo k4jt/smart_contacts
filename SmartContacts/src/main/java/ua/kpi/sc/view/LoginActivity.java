@@ -129,7 +129,9 @@ public class LoginActivity extends Activity {
     private void testClick(Activity activity) {
 
         Group group = new Group(activity);
-        group.createGroup("test_group");
+        //group.hideAllGroups();
+        group.showAllGroups();
+        //group.createGroup("test_group");
 
         /*StatisticsCollector collector = new StatisticsCollector(activity);
         Map<String, PersonStatistics> lstSms = collector.getStatistics();
