@@ -6,6 +6,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.ContactsContract;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -80,4 +81,35 @@ public class Group {
                     ContactsContract.Groups._ID + "=?", new String[]{id});
         }
     }
+
+    public void deleteContactFromAllGroups(int contactId) {
+        int rawContactId = ContactDAO.getInstance(_activity).getRawContactId(contactId);
+        deleteRawContactFromAllGroups(rawContactId);
+    }
+
+    private void deleteRawContactFromAllGroups(int rawContactId) {
+        _activity.getContentResolver().delete(ContactsContract.Data.CONTENT_URI,                ContactsContract.CommonDataKinds.GroupMembership.RAW_CONTACT_ID + "=? AND "
+                        + ContactsContract.CommonDataKinds.GroupMembership.MIMETYPE + "=?",
+                new String[]{String.valueOf(rawContactId),
+                        ContactsContract.CommonDataKinds.GroupMembership.CONTENT_ITEM_TYPE});
+    }
+
+    public void addToGroup(int personId, int groupId) {
+
+        int rawContactId = ContactDAO.getInstance(_activity).getRawContactId(personId);
+
+        deleteRawContactFromAllGroups(rawContactId);
+
+        ContentValues values = new ContentValues();
+        values.put(ContactsContract.CommonDataKinds.GroupMembership.RAW_CONTACT_ID, rawContactId);
+        values.put(ContactsContract.CommonDataKinds.GroupMembership.GROUP_ROW_ID, groupId);
+        values.put(ContactsContract.CommonDataKinds.GroupMembership.MIMETYPE,
+                ContactsContract.CommonDataKinds.GroupMembership.CONTENT_ITEM_TYPE);
+
+         _activity.getContentResolver().insert(ContactsContract.Data.CONTENT_URI, values);
+    }
+
+
+
+
 }

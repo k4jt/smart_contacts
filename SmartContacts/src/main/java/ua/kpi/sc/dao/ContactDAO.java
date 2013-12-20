@@ -19,6 +19,7 @@ public class ContactDAO {
     private SQLiteDatabase database;
     private ContactSQLiteHelper contactHelper;
     private Map<String, String> cache;
+    private Map<Integer, Integer> cacheContactIdToRawContactId;
 
     private static Activity activity;
     private static ContactDAO instance;
@@ -37,6 +38,7 @@ public class ContactDAO {
         contactHelper = new ContactSQLiteHelper(activity.getApplicationContext());
         this.activity = activity;
         cache = new HashMap<String, String>();
+        cacheContactIdToRawContactId = new HashMap<Integer, Integer>();
         loadPhones();
     }
 
@@ -124,5 +126,25 @@ public class ContactDAO {
         return finishLoading;
     }
 
+    public int getRawContactId(int contactId) {
+        Integer rawContactId = cacheContactIdToRawContactId.get(contactId);
+        if (rawContactId == null) {
+            String[] projection=new String[]{ContactsContract.RawContacts._ID};
+            String selection=ContactsContract.RawContacts.CONTACT_ID+"=?";
+            String[] selectionArgs=new String[]{String.valueOf(contactId)};
+            Cursor c = activity.getContentResolver().query(ContactsContract.RawContacts.CONTENT_URI,projection,selection,selectionArgs , null);
+            if (c != null && c.moveToFirst()) {
+                rawContactId = c.getInt(c.getColumnIndex(ContactsContract.RawContacts._ID));
+                c.close();
+            }
+
+            if (rawContactId != null) {
+                cacheContactIdToRawContactId.put(contactId, rawContactId);
+                return rawContactId;
+            }
+        }
+
+        return 0;
+    }
 
 }

@@ -5,6 +5,7 @@ import android.content.ContentResolver;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.CallLog;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -152,7 +153,7 @@ public class StatisticsCollector {
 
         for (Sms sms : lstSms) {
             String contactId = contactDAO.getContactId(sms.getAddress());
-
+            Log.e("-----",sms.getAddress() + " : " + contactId);
             if (contactId == null) continue;
 
             IOStatistics smsStat = smsStatistics.get(contactId);

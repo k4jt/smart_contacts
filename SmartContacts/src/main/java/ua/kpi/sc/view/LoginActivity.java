@@ -129,8 +129,11 @@ public class LoginActivity extends Activity {
     private void testClick(Activity activity) {
 
         Group group = new Group(activity);
+
+        group.addToGroup(1933, 15);
+
         //group.hideAllGroups();
-        group.showAllGroups();
+        //group.showAllGroups();
         //group.createGroup("test_group");
 
         /*StatisticsCollector collector = new StatisticsCollector(activity);
