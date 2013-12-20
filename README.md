@@ -10,3 +10,8 @@ In any case, it is useful at least to drank extra contacts that is useless.
 
 Memory usage
 ============
+![](https://raw.github.com/k4jt/smart_contacts/master/memory_usage.png)
+
+Team
+====
+Smolin Yaroslav & Manilo Volodymyr (KM-81m)
